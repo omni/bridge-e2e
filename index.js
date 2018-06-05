@@ -8,6 +8,7 @@ const kill = require('tree-kill')
 
 const configDir = path.join(__dirname, 'config')
 const deployContractsDir = path.join(__dirname, 'submodules/poa-bridge-contracts/deploy')
+const abisDir = path.join(__dirname, 'submodules/poa-bridge-contracts/build/contracts')
 const bridgeDir = path.join(__dirname, 'submodules/bridge-nodejs')
 
 const privateKeyUser = '0x63e48a8ba0b99e0377c6b483af4a072cbca5ffbcfdac77be72e69f4960125800'
@@ -19,7 +20,7 @@ const { toBN } = foreignWeb3.utils
 
 homeWeb3.eth.accounts.wallet.add(privateKeyUser)
 
-const tokenAbi = require('./token.json')
+const tokenAbi = require(path.join(abisDir, 'POA20.json')).abi
 const token = new foreignWeb3.eth.Contract(tokenAbi, '0xdbeE25CbE97e4A5CC6c499875774dc7067E9426B')
 
 const sleep = timeout => new Promise(res => setTimeout(res, timeout))
