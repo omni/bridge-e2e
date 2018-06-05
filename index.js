@@ -25,7 +25,7 @@ const token = new foreignWeb3.eth.Contract(tokenAbi, '0xdbeE25CbE97e4A5CC6c49987
 
 const sleep = timeout => new Promise(res => setTimeout(res, timeout))
 
-function waitUntil(fn, timeout) {
+function waitUntil(fn, timeoutMs) {
   function tryIt(fn, cb) {
     Promise.resolve(fn())
       .then(result => {
@@ -40,9 +40,12 @@ function waitUntil(fn, timeout) {
   }
 
   return new Promise(resolve => {
-    setTimeout(() => resolve(false), timeout)
+    const timeout = setTimeout(() => resolve(false), timeoutMs)
 
-    tryIt(fn, resolve)
+    tryIt(fn, (result) => {
+      resolve(result)
+      clearTimeout(timeout)
+    })
   })
 }
 
@@ -110,6 +113,7 @@ async function main() {
   }, 30000)
   assert(satisfied, 'Account should have tokens')
 
+  console.log(chalk.blue('kill child processes'))
   kill(homeParity.pid)
   kill(foreignParity.pid)
   kill(bridge.pid)
