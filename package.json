@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "postinstall": "git submodule update --init && cd submodules/poa-bridge-contracts && npm install && ./node_modules/.bin/truffle compile && cd deploy && npm install && cd ../../bridge-nodejs && npm install"
+    "postinstall": "git submodule update --init && cd submodules/poa-bridge-contracts && npm install && ./node_modules/.bin/truffle compile && cd deploy && npm install && cd ../../bridge-nodejs && npm install",
+    "start": "node index.js"
   },
   "author": "",
   "license": "ISC",
