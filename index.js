@@ -6,15 +6,15 @@ const assert = require('assert')
 const chalk = require('chalk')
 const kill = require('tree-kill')
 
-const configDir = path.join(__dirname, 'config')
+const envsDir = path.join(__dirname, 'envs')
 const deployContractsDir = path.join(__dirname, 'submodules/poa-bridge-contracts/deploy')
 const abisDir = path.join(__dirname, 'submodules/poa-bridge-contracts/build/contracts')
 const bridgeDir = path.join(__dirname, 'submodules/bridge-nodejs')
 
 const privateKeyUser = '0x63e48a8ba0b99e0377c6b483af4a072cbca5ffbcfdac77be72e69f4960125800'
 
-const homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'))
-const foreignWeb3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8555'))
+const homeWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity1:8545'))
+const foreignWeb3 = new Web3(new Web3.providers.HttpProvider('http://parity2:8545'))
 
 const { toBN } = foreignWeb3.utils
 
@@ -72,19 +72,16 @@ async function main() {
 
   // start parity nodes
   console.log(chalk.blue('start parity nodes'))
-  const homeParity = exec('parity --chain ./config/chain.json -d ./data/data-home --reseal-min-period 0')
-  const foreignParity = exec('parity --chain ./config/chain.json -d ./data/data-foreign --reseal-min-period 0 --ports-shift 10')
-
-  await Promise.all([waitForOutput(homeParity, 'Public node URL'), waitForOutput(foreignParity, 'Public node URL')])
+  await sleep(1000)
 
   // deploy bridge contracts
-  shell.cp(path.join(configDir, 'contracts-deploy.env'), path.join(deployContractsDir, '.env'))
+  shell.cp(path.join(envsDir, 'contracts-deploy.env'), path.join(deployContractsDir, '.env'))
   console.log(chalk.blue('deploy contracts'))
   shell.cd(deployContractsDir)
   shell.exec('node deploy.js')
 
   // start bridge
-  shell.cp(path.join(configDir, 'bridge.env'), path.join(bridgeDir, '.env'))
+  shell.cp(path.join(envsDir, 'bridge.env'), path.join(bridgeDir, '.env'))
   console.log(chalk.blue('start bridge'))
   shell.cd(bridgeDir)
   shell.exec('git checkout db')
@@ -114,8 +111,6 @@ async function main() {
   assert(satisfied, 'Account should have tokens')
 
   console.log(chalk.blue('kill child processes'))
-  kill(homeParity.pid)
-  kill(foreignParity.pid)
   kill(bridge.pid)
 }
 

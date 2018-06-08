@@ -1,0 +1,9 @@
+version: '3'
+services:
+  parity1:
+    image: parity
+  parity2:
+    image: parity
+  e2e:
+    image: e2e
+    command: "true"
